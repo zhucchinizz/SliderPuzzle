@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slider Puzzle</title>
+</head>
+<body>
+    <h1>Slider Puzzle Game</h1>
+    <div id="notification"></div>
+    <div id="output">Moves: <span id="move-count">0</span></div>
+    <div id="puzzle">
+    </div>
+    <div id="buttons">
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+
+
+    <script>
+        const puzzle = document.getElementById('puzzle');
+        let moveCount = 0;
+        let gameStarted = false;
+
+
+
+
+        function startGame() {
+            gameStarted = true;
+            moveCount = 0;
+            document.getElementById('move-count').textContent = moveCount;
+            shuffleBoard();
+        }
+
+
+        function resetGame() {
+            gameStarted = false;
+            moveCount = 0;
+            document.getElementById('move-count').textContent = moveCount;
+        }
+
+
+        function shuffleBoard() {
+            const presets = [
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'empty'],
+
+            ];
+            const randomIndex = Math.floor(Math.random() * presets.length);
+            const selectedPreset = presets[randomIndex];
+            puzzle.innerHTML = '';
+            selectedPreset.forEach((value, i) => {
+                const tile = document.createElement('div');
+                tile.className = value === 'empty' ? 'tile empty' : 'tile';
+                tile.textContent = value !== 'empty' ? value : '';
+                tile.onclick = function() { moveTile(this); };
+                puzzle.appendChild(tile);
+            });
+        }
+
+        function startGame() {
+            gameStarted = true;
+            moveCount = 0;
+            document.getElementById('move-count').textContent = moveCount;
+            shuffleBoard();
+            showNotification('Game started! Good luck!');
+        }
+
+
+        function resetGame() {
+            gameStarted = false;
+            moveCount = 0;
+            document.getElementById('move-count').textContent = moveCount;
+        }
+        
+        function shuffleBoard(){
+
+        }
+
+
+
+       
+        //window.onload = shuffleBoard;
+    </script>
+</body>
+</html>
+
+
+
