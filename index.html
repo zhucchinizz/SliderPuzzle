@@ -4,14 +4,115 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    /*https://stackoverflow.com/questions/30125705/css-how-to-make-an-element-fade-in-and-then-fade-out*/
+    /*https://www.w3schools.com/cssref/css_selectors.php*/
+    #notification.show {
+        display: block;
+        animation: fadeInOut 3s forwards;
+    }
+
+    #notification {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #5D97FF;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px #ffffff;
+        z-index: 1; /* Puts the notifcation on top of the game box */
+        transition:0.5s;
+    }
+
+    /*https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes*/
+    @keyframes fadeInOut {
+        from {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(0%);
+        }
+    }
+
+    #puzzle{
+        display: grid;
+        grid-template-columns: repeat(4, 180px);
+        grid-template-rows: repeat(4, 180px);
+        grid-gap: 5px;
+        margin: 20px auto;
+        background: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 1);
+    }
+
+    /*https://www.w3schools.com/css/css3_box-sizing.asp*/
+    *   {               /* The "*" selects all elements*/ 
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        background-color: gray;
+        font-family: 'Arial', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        flex-direction: column;
+    }
+
+
+    h1 {
+        background-color: #5D97FF;
+        border: none;
+        padding: 10px 15px;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-right: 10px;
+        transition: background-color 0.3s ease;
+        margin-bottom: 0.5em;
+    }
+
+    button {
+        background-color: #5D97FF;
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-right: 10px;
+        transition: bakground-color 0.3s ease;
+    }
+
+    #output{
+        background-color: #5D97FF;
+        border: none;
+        padding: 10px 15px;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-right: 10px;
+        transition: background-color 0.3s ease;
+    }
+    #buttons {
+        margin: 20px;
+    }
+
+
+    </style>
     <title>Slider Puzzle</title>
 </head>
 <body>
     <h1>Slider Puzzle Game</h1>
     <div id="notification"></div>
     <div id="output">Moves: <span id="move-count">0</span></div>
-    <div id="puzzle">
-    </div>
+    <div id="puzzle"></div>
     <div id="buttons">
         <button onclick="startGame()">Start Game</button>
         <button onclick="resetGame()">Reset</button>
@@ -23,14 +124,11 @@
         let moveCount = 0;
         let gameStarted = false;
 
-
-
-
         function startGame() {
             gameStarted = true;
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
-            shuffleBoard();
+            resetBoard();
         }
 
 
@@ -40,47 +138,45 @@
             document.getElementById('move-count').textContent = moveCount;
         }
 
-
-        function shuffleBoard() {
-            const presets = [
-                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'empty'],
-
-            ];
-            const randomIndex = Math.floor(Math.random() * presets.length);
-            const selectedPreset = presets[randomIndex];
+        function resetBoard() {
+            const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'empty'];
+            const reset = Math.floor(Math.random() * preset.length);
+            const selectedPreset = preset[reset];
             puzzle.innerHTML = '';
             selectedPreset.forEach((value, i) => {
                 const tile = document.createElement('div');
-                tile.className = value === 'empty' ? 'tile empty' : 'tile';
-                tile.textContent = value !== 'empty' ? value : '';
+                tile.className = value == 'empty' ? 'tile empty' : 'tile';
+                tile.textContent = value != 'empty' ? value : '';
                 tile.onclick = function() { moveTile(this); };
                 puzzle.appendChild(tile);
             });
         }
-
+        //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
         function startGame() {
             gameStarted = true;
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
-            shuffleBoard();
+            resetBoard();
             showNotification('Game started! Good luck!');
         }
-
-
-        function resetGame() {
+        //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
+        function resetGame(){
             gameStarted = false;
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
-        }
-        
-        function shuffleBoard(){
-
+            showNotification('Board reset');
         }
 
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
 
-
-       
-        //window.onload = shuffleBoard;
+        window.onload = resetBoard;
     </script>
 </body>
 </html>
