@@ -9,7 +9,7 @@
     /*https://www.w3schools.com/cssref/css_selectors.php*/
     #notification.show {
         display: block;
-        animation: fadeInOut 3s forwards;
+        animation: fadeInOut 2s forwards;
     }
 
     #notification {
@@ -123,12 +123,20 @@
         const puzzle = document.getElementById('puzzle');
         let moveCount = 0;
         let gameStarted = false;
+        const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
 
         function startGame() {
             gameStarted = true;
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
-            resetBoard();
+            const shuffledPreset = shuffle(preset);
+            shuffledPreset.forEach((value, i) => {
+                const tile = document.createElement('div');
+                tile.className = value == '15' ? 'tile empty' : 'tile';
+                tile.textContent = value;
+                tile.onclick = function() { moveTile(this); };
+                puzzle.appendChild(tile);
+            });
         }
 
 
@@ -137,28 +145,48 @@
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
         }
-
+        
+        //https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
+        //https://www.w3schools.com/jsref/met_node_appendchild.asp
         function resetBoard() {
-            const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'empty'];
-            const reset = Math.floor(Math.random() * preset.length);
-            const selectedPreset = preset[reset];
+            const puzzle = document.getElementById('puzzle');
             puzzle.innerHTML = '';
-            selectedPreset.forEach((value, i) => {
+            preset.forEach((value, i) => {
                 const tile = document.createElement('div');
-                tile.className = value == 'empty' ? 'tile empty' : 'tile';
-                tile.textContent = value != 'empty' ? value : '';
+                tile.className = value == '15' ? 'tile empty' : 'tile';
+                tile.textContent = value;
                 tile.onclick = function() { moveTile(this); };
                 puzzle.appendChild(tile);
             });
-        }
-        //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
-        function startGame() {
-            gameStarted = true;
-            moveCount = 0;
-            document.getElementById('move-count').textContent = moveCount;
-            resetBoard();
-            showNotification('Game started! Good luck!');
-        }
+            }
+            //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
+            function startGame() {
+                gameStarted = true;
+                moveCount = 0;
+                document.getElementById('move-count').textContent = moveCount;
+                // Shuffle the preset array
+                const shuffledPreset = shuffle(preset);
+                // Loop through the shuffled array to create the tiles
+                shuffledPreset.forEach((value, i) => {
+                    const tile = document.createElement('div');
+                    tile.className = value == '15' ? 'tile empty' : 'tile';
+                    tile.textContent = value;
+                    tile.onclick = function() { moveTile(this); };
+                    puzzle.appendChild(tile);
+                });
+                showNotification('Game started! Good luck!');
+            }
+
+            function shuffle(array) {
+                let currentIndex = array.length;
+                for (let i = 0; i < currentIndex; i++) {
+                    const randomIndex = Math.floor(Math.random() * currentIndex);
+                    [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
+                }
+                return array;
+            }
+
+        
         //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
         function resetGame(){
             gameStarted = false;
@@ -167,6 +195,8 @@
             showNotification('Board reset');
         }
 
+        //https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+        //https://www.w3schools.com/jsref/prop_element_classlist.asp
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
