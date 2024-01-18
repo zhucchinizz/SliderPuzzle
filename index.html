@@ -28,6 +28,7 @@
     }
 
     /*https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes*/
+    /*https://www.w3schools.com/cssref/tryit.php?filename=trycss3_keyframes*/
     @keyframes fadeInOut {
         from {
             transform: translateX(100%);
@@ -103,6 +104,15 @@
     #buttons {
         margin: 20px;
     }
+    
+    button:hover {
+        background-color: #4177E1;
+    }
+
+
+    button:focus {
+        outline: none;
+    }
 
 
     </style>
@@ -123,87 +133,95 @@
         const puzzle = document.getElementById('puzzle');
         let moveCount = 0;
         let gameStarted = false;
-        const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
 
         function startGame() {
             gameStarted = true;
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
-            const shuffledPreset = shuffle(preset);
-            shuffledPreset.forEach((value, i) => {
-                const tile = document.createElement('div');
-                tile.className = value == '15' ? 'tile empty' : 'tile';
-                tile.textContent = value;
-                tile.onclick = function() { moveTile(this); };
-                puzzle.appendChild(tile);
-            });
+            resetBoard();
+            showNotification('Game started! Good luck!');
         }
 
-
-        function resetGame() {
-            gameStarted = false;
-            moveCount = 0;
-            document.getElementById('move-count').textContent = moveCount;
-        }
-        
-        //https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
-        //https://www.w3schools.com/jsref/met_node_appendchild.asp
-        function resetBoard() {
-            const puzzle = document.getElementById('puzzle');
-            puzzle.innerHTML = '';
-            preset.forEach((value, i) => {
-                const tile = document.createElement('div');
-                tile.className = value == '15' ? 'tile empty' : 'tile';
-                tile.textContent = value;
-                tile.onclick = function() { moveTile(this); };
-                puzzle.appendChild(tile);
-            });
-            }
-            //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
-            function startGame() {
-                gameStarted = true;
-                moveCount = 0;
-                document.getElementById('move-count').textContent = moveCount;
-                // Shuffle the preset array
-                const shuffledPreset = shuffle(preset);
-                // Loop through the shuffled array to create the tiles
-                shuffledPreset.forEach((value, i) => {
-                    const tile = document.createElement('div');
-                    tile.className = value == '15' ? 'tile empty' : 'tile';
-                    tile.textContent = value;
-                    tile.onclick = function() { moveTile(this); };
-                    puzzle.appendChild(tile);
-                });
-                showNotification('Game started! Good luck!');
-            }
-
-            function shuffle(array) {
-                let currentIndex = array.length;
-                for (let i = 0; i < currentIndex; i++) {
-                    const randomIndex = Math.floor(Math.random() * currentIndex);
-                    [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
-                }
-                return array;
-            }
-
-        
-        //A repeat of previous function, except this is made so the user doesn't have to reset the website every time they want to play again
         function resetGame(){
             gameStarted = false;
             moveCount = 0;
             document.getElementById('move-count').textContent = moveCount;
             showNotification('Board reset');
+            resetBoard();
         }
+
+        //https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
+        //https://www.w3schools.com/jsref/met_node_appendchild.asp
+        function resetBoard() {
+        const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+        const randomIndex = Math.floor(Math.random() * preset.length);
+        puzzle.innerHTML = '';
+        preset.forEach((value, i) => {
+            const tile = document.createElement('div');
+            tile.className = value == 'empty' ? 'tile empty' : 'tile';
+            tile.textContent = value != 'empty' ? value : '';
+            tile.onclick = function() { moveTile(this); };
+            puzzle.appendChild(tile);
+        });
+        }
+        
+        //https://www.w3schools.com/jsref/met_win_alert.asp
+        function moveTile(tile) {
+        if (gameStarted) {
+            const emptyTile = document.querySelector('.tile.empty');
+            if (canMove(tile, emptyTile)) {
+            swapTiles(tile, emptyTile);
+            moveCount++;
+            document.getElementById('move-count').textContent = moveCount;
+            if (isSolved()) {
+                alert('Congratulations! You solved the puzzle in ' + moveCount + ' moves.');
+                gameStarted = false;
+            }
+            }
+        }
+        }
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+        function canMove(tile, emptyTile) {
+        const tileIndex = Array.from(puzzle.children).indexOf(tile);
+        const emptyTileIndex = Array.from(puzzle.children).indexOf(emptyTile);
+        const tileRow = Math.floor(tileIndex / 4);
+        const emptyTileRow = Math.floor(emptyTileIndex / 4);
+        const tileCol = tileIndex % 4;
+        const emptyTileCol = emptyTileIndex % 4;
+        return (tileRow == emptyTileRow && Math.abs(tileCol - emptyTileCol) == 1) ||
+                (tileCol == emptyTileCol && Math.abs(tileRow - emptyTileRow) == 1);
+        }
+        //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_toggle_class
+        //https://www.w3schools.com/howto/howto_js_toggle_class.asp
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+        function swapTiles(tile, emptyTile) {
+        const tileText = tile.textContent;
+        tile.textContent = emptyTile.textContent;
+        emptyTile.textContent = tileText;
+        tile.classList.toggle('empty');
+        emptyTile.classList.toggle('empty');
+        }
+
+        function isSolved() {
+        const tiles = Array.from(puzzle.children);
+        for (let i = 0; i < tiles.length - 1; i++) {
+            if (tiles[i].textContent != (i + 1).toString()) {
+            return false;
+            }
+        }
+        return tiles[tiles.length - 1].classList.contains('empty');
+        }
+
 
         //https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
         //https://www.w3schools.com/jsref/prop_element_classlist.asp
         function showNotification(message) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
         }
 
         window.onload = resetBoard;
