@@ -114,6 +114,30 @@
         outline: none;
     }
 
+    .tile:hover {
+        background-color: red;
+    }
+
+
+    .empty {
+        visibility: hidden;
+    }
+
+    .tile {
+        width: 180px;
+        height: 180px;
+        background-color: #5D97FF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+
 
     </style>
     <title>Slider Puzzle</title>
@@ -126,6 +150,7 @@
     <div id="buttons">
         <button onclick="startGame()">Start Game</button>
         <button onclick="resetGame()">Reset</button>
+        <button onclick="randomizeTiles()">Randomize</button>
     </div>
 
 
@@ -153,7 +178,7 @@
         //https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
         //https://www.w3schools.com/jsref/met_node_appendchild.asp
         function resetBoard() {
-        const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+        const preset = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15','empty'];
         const randomIndex = Math.floor(Math.random() * preset.length);
         puzzle.innerHTML = '';
         preset.forEach((value, i) => {
@@ -165,9 +190,22 @@
         });
         }
         
+        function randomizeTiles() {
+        if (!gameStarted) {
+            return; // Randomize button only active during the game
+        }
+        const tiles = Array.from(puzzle.children);
+        const tileValues = tiles.map(tile => tile.textContent);
+        const shuffledValues = tileValues.sort(() => Math.random() - 0.5);
+        tiles.forEach((tile, i) => {
+            tile.textContent = shuffledValues[i];
+            tile.className = shuffledValues[i] !== '' ? 'tile' : 'tile empty';
+        });
+    }
+
         //https://www.w3schools.com/jsref/met_win_alert.asp
         function moveTile(tile) {
-        if (gameStarted) {
+        if (gameStarted == true) {
             const emptyTile = document.querySelector('.tile.empty');
             if (canMove(tile, emptyTile)) {
             swapTiles(tile, emptyTile);
@@ -180,6 +218,7 @@
             }
         }
         }
+        
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
         function canMove(tile, emptyTile) {
         const tileIndex = Array.from(puzzle.children).indexOf(tile);
@@ -191,6 +230,7 @@
         return (tileRow == emptyTileRow && Math.abs(tileCol - emptyTileCol) == 1) ||
                 (tileCol == emptyTileCol && Math.abs(tileRow - emptyTileRow) == 1);
         }
+
         //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_toggle_class
         //https://www.w3schools.com/howto/howto_js_toggle_class.asp
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
@@ -224,10 +264,12 @@
         }, 3000);
         }
 
-        window.onload = resetBoard;
+        window.onload = resetBoard();
     </script>
 </body>
 </html>
+
+
 
 
 
